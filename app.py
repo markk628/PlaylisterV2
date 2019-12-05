@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
 def video_url_creator(id_lst):
     videos = []
     for vid_id in id_lst:
-        # We know that embedded YouTube videos always have this format
         video = 'https://youtube.com/embed/' + vid_id
         videos.append(video)
     return videos
@@ -41,3 +41,9 @@ def playlists_submit():
     }
     playlists.insert_one(playlist)
     return redirect(url_for('playlists_index'))
+
+@app.route('/playlists/<playlist_id>')
+def playlists_show(playlist_id):
+    """Show a single playlist."""
+    playlist = playlists.find_one({'_id': ObjectId(playlist_id)})
+    return render_template('playlists_show.html', playlist=playlist)
